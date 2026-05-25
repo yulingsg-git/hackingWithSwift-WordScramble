@@ -36,6 +36,8 @@ struct ContentView: View {
             .onAppear(perform: startGame)
             .alert(errorTitle, isPresented: $showingError) { } message: {
                 Text(errorMessage)
+            }.toolbar {
+                Button("Reset", action: startGame)
             }
         }
     }
@@ -60,12 +62,12 @@ struct ContentView: View {
             return
         }
 
-        guard tooShort(answer) else {
+        guard !tooShort(answer) else {
             wordError(title: "Word too short", message: "Try again!")
             return
         }
 
-        guard isRootWord(answer) else {
+        guard !isRootWord(answer) else {
             wordError(title: "Word is the same", message: "Can't use the same word as the word given")
             return
         }
@@ -81,6 +83,8 @@ struct ContentView: View {
             if let startWords = try? String(contentsOf: startWordsURL, encoding:.utf8) {
                 let allWords = startWords.components(separatedBy: "\n")
                 rootWord = allWords.randomElement() ?? "silkworm"
+                usedWords.removeAll()
+                newWord = ""
                 return
             }
         }
@@ -111,7 +115,7 @@ struct ContentView: View {
     }
 
     func tooShort(_ word: String) -> Bool {
-        word.count < 3
+        word.count < 4
     }
 
     func isRootWord(_ word: String) -> Bool {
